@@ -26,9 +26,9 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    title: 'Aurora — Brand Film',
-    slug: 'aurora-brand-film',
-    category: 'Motion Graphics',
+    title: 'Liquor By Door',
+    slug: 'Liquor By Door',
+    category: 'Graphics Dewsign',
     thumbnail: '/images/project-01.jpg',
     previewVideo: '/videos/project-preview.mp4',
     galleryImages: [
