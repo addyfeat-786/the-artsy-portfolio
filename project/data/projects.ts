@@ -39,7 +39,7 @@ export const projects: Project[] = [
     description:
       'A cinematic brand film for Aurora, a Nordic skincare house. Light, glass, and motion dissolve into a single breathing frame.',
     software: ['After Effects', 'Cinema 4D', 'DaVinci Resolve'],
-    client: 'Aurora Skincare',
+    client: 'Liquor By Door',
     year: '2024',
     featured: true,
     story: {
@@ -53,8 +53,8 @@ export const projects: Project[] = [
     results: ['+312% engagement lift', 'Featured on Awwwards', '2.4M views in 30 days'],
   },
   {
-    title: 'Monolith — Title Sequence',
-    slug: 'monolith-title-sequence',
+    title: 'Graphic Design',
+    slug: 'Social media handeling',
     category: 'Motion Graphics',
     thumbnail: '/images/project-02.jpg',
     previewVideo: '/videos/project-preview.mp4',
