@@ -28,7 +28,7 @@ export const projects: Project[] = [
   {
     title: 'Liquor By Door',
     slug: 'Liquor By Door',
-    category: 'Graphics Dewsign',
+    category: 'Graphics Design',
     thumbnail: '/images/project-01.jpg',
     previewVideo: '/videos/project-preview.mp4',
     galleryImages: [
