@@ -47,9 +47,12 @@ export default function Navbar() {
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:h-20 md:px-10">
-          <Link href="/" className="font-display text-lg font-semibold tracking-tightest">
-            THE<span className="italic"> ARTSY</span>
-          </Link>
+          <span className="font-display text-lg font-semibold">
+  NO<span className="italic">FILTER</span>
+  <span className="ml-1 text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
+    BY ARTSY
+  </span>
+</span>
 
           <ul className="hidden items-center gap-8 md:flex">
             {links.map((l) => {
@@ -98,7 +101,12 @@ export default function Navbar() {
             transition={{ duration: 0.4 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
-              <span className="font-display text-lg font-semibold">THE ARTSY</span>
+              <span className="font-display text-lg font-semibold">
+  NO<span className="italic">FILTER</span>
+  <span className="ml-1 text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
+    BY ARTSY
+  </span>
+</span>
               <button aria-label="Close" onClick={() => setOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
