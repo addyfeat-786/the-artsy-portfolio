@@ -6,14 +6,6 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 /* -------------------------------------------------------------------------- */
-/*                                  TYPES                                     */
-/* -------------------------------------------------------------------------- */
-
-interface HeroSculptureProps {
-  onFlash?: () => void;
-}
-
-/* -------------------------------------------------------------------------- */
 /*                                   STARS                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -21,7 +13,7 @@ function Stars() {
   const starsRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
-    const count = 1200;
+    const count = 800;
     const arr = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -38,9 +30,9 @@ function Stars() {
   }, []);
 
   useFrame((state) => {
-    if (!starsRef.current) return;
-
-    starsRef.current.rotation.y = state.clock.elapsedTime * 0.002;
+    if (starsRef.current) {
+      starsRef.current.rotation.y = state.clock.elapsedTime * 0.002;
+    }
   });
 
   return (
@@ -56,7 +48,7 @@ function Stars() {
         color="#ffffff"
         size={0.018}
         transparent
-        opacity={0.65}
+        opacity={0.5}
         sizeAttenuation
         depthWrite={false}
       />
@@ -72,7 +64,7 @@ function DustParticles() {
   const dustRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
-    const count = 250;
+    const count = 180;
     const arr = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
@@ -87,7 +79,8 @@ function DustParticles() {
   useFrame((state) => {
     if (!dustRef.current) return;
 
-    dustRef.current.rotation.y = state.clock.elapsedTime * 0.004;
+    dustRef.current.rotation.y =
+      state.clock.elapsedTime * 0.004;
 
     dustRef.current.position.y =
       Math.sin(state.clock.elapsedTime * 0.1) * 0.08;
@@ -106,7 +99,7 @@ function DustParticles() {
         color="#ffffff"
         size={0.025}
         transparent
-        opacity={0.25}
+        opacity={0.2}
         sizeAttenuation
         depthWrite={false}
       />
@@ -115,191 +108,16 @@ function DustParticles() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                   MOON                                     */
+/*                              THREE.JS OVERLAY                              */
 /* -------------------------------------------------------------------------- */
 
-function MoonSurface({
-  onFlash,
-}: {
-  onFlash?: () => void;
-}) {
-  const moonRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    if (!moonRef.current) return;
-
-    const targetRotationY =
-      state.pointer.x * 0.025 +
-      state.clock.elapsedTime * 0.004;
-
-    const targetRotationX = -state.pointer.y * 0.018;
-
-    moonRef.current.rotation.y = THREE.MathUtils.lerp(
-      moonRef.current.rotation.y,
-      targetRotationY,
-      0.015
-    );
-
-    moonRef.current.rotation.x = THREE.MathUtils.lerp(
-      moonRef.current.rotation.x,
-      targetRotationX,
-      0.015
-    );
-
-    moonRef.current.position.y =
-      -5.25 +
-      Math.sin(state.clock.elapsedTime * 0.12) * 0.035;
-  });
-
-  return (
-    <group
-      ref={moonRef}
-      position={[0, -5.25, -3.8]}
-      onClick={() => onFlash?.()}
-    >
-      {/* MAIN MOON */}
-      <mesh>
-        <sphereGeometry args={[6.4, 160, 160]} />
-
-        <meshStandardMaterial
-          color="#555555"
-          roughness={0.98}
-          metalness={0}
-        />
-      </mesh>
-
-      {/* LARGE CRATERS */}
-
-      <mesh position={[-1.7, 1.1, 5.75]}>
-        <circleGeometry args={[0.62, 64]} />
-        <meshBasicMaterial
-          color="#1d1d1d"
-          transparent
-          opacity={0.32}
-        />
-      </mesh>
-
-      <mesh position={[1.6, 0.65, 6.05]}>
-        <circleGeometry args={[0.42, 64]} />
-        <meshBasicMaterial
-          color="#202020"
-          transparent
-          opacity={0.3}
-        />
-      </mesh>
-
-      <mesh position={[0.25, 1.75, 6.05]}>
-        <circleGeometry args={[0.28, 64]} />
-        <meshBasicMaterial
-          color="#171717"
-          transparent
-          opacity={0.28}
-        />
-      </mesh>
-
-      <mesh position={[-2.7, -0.4, 5.65]}>
-        <circleGeometry args={[0.34, 64]} />
-        <meshBasicMaterial
-          color="#202020"
-          transparent
-          opacity={0.28}
-        />
-      </mesh>
-
-      <mesh position={[2.65, -0.85, 5.55]}>
-        <circleGeometry args={[0.55, 64]} />
-        <meshBasicMaterial
-          color="#1b1b1b"
-          transparent
-          opacity={0.3}
-        />
-      </mesh>
-
-      {/* SMALL CRATERS */}
-
-      <mesh position={[-0.9, 0.15, 6.32]}>
-        <circleGeometry args={[0.16, 32]} />
-        <meshBasicMaterial
-          color="#202020"
-          transparent
-          opacity={0.4}
-        />
-      </mesh>
-
-      <mesh position={[0.9, -0.35, 6.25]}>
-        <circleGeometry args={[0.2, 32]} />
-        <meshBasicMaterial
-          color="#1c1c1c"
-          transparent
-          opacity={0.38}
-        />
-      </mesh>
-
-      <mesh position={[-2.2, 1.8, 5.65]}>
-        <circleGeometry args={[0.18, 32]} />
-        <meshBasicMaterial
-          color="#1c1c1c"
-          transparent
-          opacity={0.35}
-        />
-      </mesh>
-
-      <mesh position={[2.15, 1.5, 5.85]}>
-        <circleGeometry args={[0.22, 32]} />
-        <meshBasicMaterial
-          color="#1c1c1c"
-          transparent
-          opacity={0.35}
-        />
-      </mesh>
-
-      {/* DARK EDGE */}
-
-      <mesh scale={1.003}>
-        <sphereGeometry args={[6.4, 160, 160]} />
-
-        <meshBasicMaterial
-          color="#000000"
-          transparent
-          opacity={0.05}
-          side={THREE.BackSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                                  LIGHTS                                    */
-/* -------------------------------------------------------------------------- */
-
-function SceneLights() {
+function ThreeOverlay() {
   return (
     <>
-      <directionalLight
-        position={[-6, 8, 8]}
-        intensity={2.2}
-        color="#f5f5f4"
-      />
-
-      <directionalLight
-        position={[5, 1, 6]}
-        intensity={0.35}
-        color="#a1a1aa"
-      />
-
-      <directionalLight
-        position={[0, -6, 3]}
-        intensity={0.05}
-        color="#64748b"
-      />
-
-      <pointLight
-        position={[0, 4, 5]}
-        intensity={0.45}
-        distance={18}
-        color="#ffffff"
-      />
+      <ambientLight intensity={0.3} />
+      <Stars />
+      <DustParticles />
+      <Environment preset="night" />
     </>
   );
 }
@@ -308,45 +126,45 @@ function SceneLights() {
 /*                                HERO SCENE                                  */
 /* -------------------------------------------------------------------------- */
 
-export default function HeroSculpture({
-  onFlash,
-}: HeroSculptureProps) {
+export default function HeroSculpture() {
   return (
     <div className="absolute inset-0 h-full w-full overflow-hidden">
-      <Canvas
-        camera={{
-          position: [0, 0, 11],
-          fov: 42,
-        }}
-        dpr={[1, 2]}
-        gl={{
-          alpha: true,
-          antialias: true,
-        }}
-        onCreated={({ gl }) => {
-          gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 1;
-        }}
+
+      {/* BACKGROUND VIDEO */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 h-full w-full object-cover"
       >
-        <color attach="background" args={['#030405']} />
+        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+      </video>
 
-        <fog
-          attach="fog"
-          args={['#030405', 12, 30]}
-        />
+      {/* DARK CINEMATIC OVERLAY */}
+      <div className="absolute inset-0 bg-black/45" />
 
-        <ambientLight intensity={0.12} />
+      {/* GRADIENT FOR BETTER TEXT VISIBILITY */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
 
-        <SceneLights />
-
-        <MoonSurface onFlash={onFlash} />
-
-        <Stars />
-
-        <DustParticles />
-
-        <Environment preset="night" />
-      </Canvas>
+      {/* THREE.JS STARS + DUST */}
+      <div className="absolute inset-0 pointer-events-none">
+        <Canvas
+          camera={{
+            position: [0, 0, 11],
+            fov: 42,
+          }}
+          dpr={[1, 2]}
+          gl={{
+            alpha: true,
+            antialias: true,
+            toneMapping: THREE.ACESFilmicToneMapping,
+          }}
+        >
+          <ThreeOverlay />
+        </Canvas>
+      </div>
     </div>
   );
 }
