@@ -5,40 +5,34 @@ import { Environment } from '@react-three/drei';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
-type MoonProps = {
-  onFlash?: () => void;
-};
-
 /* -------------------------------------------------------------------------- */
-/*                              STAR BACKGROUND                               */
+/*                                   STARS                                    */
 /* -------------------------------------------------------------------------- */
 
 function Stars() {
   const starsRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
-    const count = 900;
-    const positions = new Float32Array(count * 3);
+    const count = 1200;
+    const arr = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      const radius = 8 + Math.random() * 18;
+      const radius = 10 + Math.random() * 18;
       const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
+      const y = (Math.random() - 0.5) * 14;
 
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.cos(phi);
-      positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+      arr[i * 3] = Math.cos(theta) * radius;
+      arr[i * 3 + 1] = y;
+      arr[i * 3 + 2] = Math.sin(theta) * radius - 8;
     }
 
-    return positions;
+    return arr;
   }, []);
 
   useFrame((state) => {
     if (!starsRef.current) return;
 
-    starsRef.current.rotation.y = state.clock.elapsedTime * 0.003;
-    starsRef.current.rotation.x =
-      Math.sin(state.clock.elapsedTime * 0.02) * 0.015;
+    starsRef.current.rotation.y = state.clock.elapsedTime * 0.002;
   });
 
   return (
@@ -53,9 +47,9 @@ function Stars() {
       <pointsMaterial
         color="#ffffff"
         size={0.018}
-        sizeAttenuation
         transparent
-        opacity={0.7}
+        opacity={0.65}
+        sizeAttenuation
         depthWrite={false}
       />
     </points>
@@ -63,35 +57,35 @@ function Stars() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              SMALL DUST                                    */
+/*                                DUST PARTICLES                              */
 /* -------------------------------------------------------------------------- */
 
 function DustParticles() {
-  const ref = useRef<THREE.Points>(null);
+  const dustRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
-    const count = 180;
+    const count = 250;
     const arr = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 14;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 8;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 8;
+      arr[i * 3] = (Math.random() - 0.5) * 16;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 10;
+      arr[i * 3 + 2] = -2 - Math.random() * 8;
     }
 
     return arr;
   }, []);
 
   useFrame((state) => {
-    if (!ref.current) return;
+    if (!dustRef.current) return;
 
-    ref.current.rotation.y = state.clock.elapsedTime * 0.006;
-    ref.current.position.y =
-      Math.sin(state.clock.elapsedTime * 0.15) * 0.08;
+    dustRef.current.rotation.y = state.clock.elapsedTime * 0.004;
+    dustRef.current.position.y =
+      Math.sin(state.clock.elapsedTime * 0.1) * 0.08;
   });
 
   return (
-    <points ref={ref}>
+    <points ref={dustRef}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -103,7 +97,7 @@ function DustParticles() {
         color="#ffffff"
         size={0.025}
         transparent
-        opacity={0.28}
+        opacity={0.25}
         sizeAttenuation
         depthWrite={false}
       />
@@ -112,111 +106,153 @@ function DustParticles() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              PROCEDURAL MOON                               */
+/*                             MOON SURFACE MATERIAL                          */
 /* -------------------------------------------------------------------------- */
 
-function createMoonGeometry() {
-  const geometry = new THREE.SphereGeometry(5.4, 180, 120);
-
-  const position = geometry.attributes.position;
-
-  for (let i = 0; i < position.count; i++) {
-    const x = position.getX(i);
-    const y = position.getY(i);
-    const z = position.getZ(i);
-
-    const length = Math.sqrt(x * x + y * y + z * z);
-
-    const nx = x / length;
-    const ny = y / length;
-    const nz = z / length;
-
-    /*
-      Multiple mathematical waves create rough lunar terrain.
-      This avoids needing an external moon texture.
-    */
-
-    const large =
-      Math.sin(nx * 3.2 + ny * 1.7) *
-      Math.cos(nz * 2.8) *
-      0.1;
-
-    const medium =
-      Math.sin(nx * 9.0 + nz * 7.0) *
-      Math.cos(ny * 8.0) *
-      0.035;
-
-    const fine =
-      Math.sin(nx * 25.0 + ny * 21.0 + nz * 18.0) *
-      0.018;
-
-    const surfaceNoise = large + medium + fine;
-
-    const scale = 1 + surfaceNoise;
-
-    position.setXYZ(
-      i,
-      x * scale,
-      y * scale,
-      z * scale
-    );
-  }
-
-  position.needsUpdate = true;
-  geometry.computeVertexNormals();
-
-  return geometry;
-}
-
-function Moon() {
+function MoonSurface() {
   const moonRef = useRef<THREE.Group>(null);
 
-  const geometry = useMemo(() => createMoonGeometry(), []);
+  /*
+    IMPORTANT:
+    Geometry bilkul normal sphere hai.
+    Isliye moon ki outer shape hamesha perfectly round rahegi.
+  */
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!moonRef.current) return;
 
-    const mouseX = state.pointer.x;
-    const mouseY = state.pointer.y;
+    const targetRotationY =
+      state.pointer.x * 0.025 +
+      state.clock.elapsedTime * 0.004;
 
-    /* Very slow cinematic movement */
-    moonRef.current.rotation.y += delta * 0.012;
+    const targetRotationX = -state.pointer.y * 0.018;
 
-    /* Subtle mouse parallax */
+    moonRef.current.rotation.y = THREE.MathUtils.lerp(
+      moonRef.current.rotation.y,
+      targetRotationY,
+      0.015
+    );
+
     moonRef.current.rotation.x = THREE.MathUtils.lerp(
       moonRef.current.rotation.x,
-      -mouseY * 0.08,
-      0.025
+      targetRotationX,
+      0.015
     );
 
-    moonRef.current.rotation.z = THREE.MathUtils.lerp(
-      moonRef.current.rotation.z,
-      mouseX * 0.025,
-      0.025
-    );
-
-    /* Gentle floating */
     moonRef.current.position.y =
-      -5.2 + Math.sin(state.clock.elapsedTime * 0.18) * 0.08;
+      -5.25 +
+      Math.sin(state.clock.elapsedTime * 0.12) * 0.035;
   });
 
   return (
-    <group ref={moonRef} position={[0, -5.2, -3.5]}>
-      {/* Main moon */}
-      <mesh geometry={geometry}>
+    <group
+      ref={moonRef}
+      position={[0, -5.25, -3.8]}
+    >
+      {/* MAIN PERFECTLY ROUND MOON */}
+      <mesh>
+        <sphereGeometry args={[6.4, 160, 160]} />
+
         <meshStandardMaterial
-          color="#5a5a5a"
-          roughness={1}
+          color="#555555"
+          roughness={0.98}
           metalness={0}
         />
       </mesh>
 
-      {/* Slight dark atmospheric shell */}
-      <mesh scale={1.006} geometry={geometry}>
+      {/* LARGE SUBTLE CRATER SHADOWS */}
+
+      <mesh position={[-1.7, 1.1, 5.75]}>
+        <circleGeometry args={[0.62, 64]} />
+        <meshBasicMaterial
+          color="#1d1d1d"
+          transparent
+          opacity={0.32}
+        />
+      </mesh>
+
+      <mesh position={[1.6, 0.65, 6.05]}>
+        <circleGeometry args={[0.42, 64]} />
+        <meshBasicMaterial
+          color="#202020"
+          transparent
+          opacity={0.3}
+        />
+      </mesh>
+
+      <mesh position={[0.25, 1.75, 6.05]}>
+        <circleGeometry args={[0.28, 64]} />
+        <meshBasicMaterial
+          color="#171717"
+          transparent
+          opacity={0.28}
+        />
+      </mesh>
+
+      <mesh position={[-2.7, -0.4, 5.65]}>
+        <circleGeometry args={[0.34, 64]} />
+        <meshBasicMaterial
+          color="#202020"
+          transparent
+          opacity={0.28}
+        />
+      </mesh>
+
+      <mesh position={[2.65, -0.85, 5.55]}>
+        <circleGeometry args={[0.55, 64]} />
+        <meshBasicMaterial
+          color="#1b1b1b"
+          transparent
+          opacity={0.3}
+        />
+      </mesh>
+
+      {/* SMALL CRATERS */}
+
+      <mesh position={[-0.9, 0.15, 6.32]}>
+        <circleGeometry args={[0.16, 32]} />
+        <meshBasicMaterial
+          color="#202020"
+          transparent
+          opacity={0.4}
+        />
+      </mesh>
+
+      <mesh position={[0.9, -0.35, 6.25]}>
+        <circleGeometry args={[0.2, 32]} />
+        <meshBasicMaterial
+          color="#1c1c1c"
+          transparent
+          opacity={0.38}
+        />
+      </mesh>
+
+      <mesh position={[-2.2, 1.8, 5.65]}>
+        <circleGeometry args={[0.18, 32]} />
+        <meshBasicMaterial
+          color="#1c1c1c"
+          transparent
+          opacity={0.35}
+        />
+      </mesh>
+
+      <mesh position={[2.15, 1.5, 5.85]}>
+        <circleGeometry args={[0.22, 32]} />
+        <meshBasicMaterial
+          color="#1c1c1c"
+          transparent
+          opacity={0.35}
+        />
+      </mesh>
+
+      {/* DARK ATMOSPHERIC EDGE */}
+      <mesh scale={1.003}>
+        <sphereGeometry args={[6.4, 160, 160]} />
+
         <meshBasicMaterial
           color="#000000"
           transparent
-          opacity={0.12}
+          opacity={0.05}
           side={THREE.BackSide}
         />
       </mesh>
@@ -225,49 +261,49 @@ function Moon() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                           CINEMATIC LIGHT RIM                              */
+/*                                  LIGHTING                                  */
 /* -------------------------------------------------------------------------- */
 
-function MoonLighting() {
+function SceneLights() {
   return (
     <>
-      {/* Main light from upper left */}
+      {/* Main cinematic light */}
       <directionalLight
-        position={[-6, 7, 5]}
-        intensity={2.4}
-        color="#ffffff"
+        position={[-6, 8, 8]}
+        intensity={2.2}
+        color="#f5f5f4"
       />
 
-      {/* Soft front fill */}
+      {/* Soft secondary fill */}
       <directionalLight
-        position={[4, 2, 6]}
-        intensity={0.28}
-        color="#9ca3af"
+        position={[5, 1, 6]}
+        intensity={0.35}
+        color="#a1a1aa"
       />
 
-      {/* Dark side */}
+      {/* Keep lower moon dark */}
       <directionalLight
-        position={[5, -3, -5]}
-        intensity={0.08}
-        color="#334155"
+        position={[0, -6, 3]}
+        intensity={0.05}
+        color="#64748b"
       />
 
-      {/* Horizon glow */}
+      {/* Gentle horizon glow */}
       <pointLight
-        position={[0, 3, 4]}
+        position={[0, 4, 5]}
         intensity={0.45}
-        distance={14}
-        color="#d6d3d1"
+        distance={18}
+        color="#ffffff"
       />
     </>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                              MAIN COMPONENT                                */
+/*                                HERO SCENE                                  */
 /* -------------------------------------------------------------------------- */
 
-export default function HeroSculpture({ onFlash }: MoonProps) {
+export default function HeroSculpture() {
   return (
     <div className="absolute inset-0 h-full w-full overflow-hidden">
       <Canvas
@@ -282,15 +318,19 @@ export default function HeroSculpture({ onFlash }: MoonProps) {
           toneMapping: THREE.ACESFilmicToneMapping,
         }}
       >
+        {/* Transparent / black cinematic world */}
         <color attach="background" args={['#030405']} />
 
-        <fog attach="fog" args={['#030405', 12, 28]} />
+        <fog
+          attach="fog"
+          args={['#030405', 12, 30]}
+        />
 
-        <ambientLight intensity={0.18} />
+        <ambientLight intensity={0.12} />
 
-        <MoonLighting />
+        <SceneLights />
 
-        <Moon />
+        <MoonSurface />
 
         <Stars />
 
