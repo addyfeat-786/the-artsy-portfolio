@@ -6,6 +6,14 @@ import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 /* -------------------------------------------------------------------------- */
+/*                                  TYPES                                     */
+/* -------------------------------------------------------------------------- */
+
+interface HeroSculptureProps {
+  onFlash?: () => void;
+}
+
+/* -------------------------------------------------------------------------- */
 /*                                   STARS                                    */
 /* -------------------------------------------------------------------------- */
 
@@ -57,7 +65,7 @@ function Stars() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                DUST PARTICLES                              */
+/*                               DUST PARTICLES                               */
 /* -------------------------------------------------------------------------- */
 
 function DustParticles() {
@@ -80,6 +88,7 @@ function DustParticles() {
     if (!dustRef.current) return;
 
     dustRef.current.rotation.y = state.clock.elapsedTime * 0.004;
+
     dustRef.current.position.y =
       Math.sin(state.clock.elapsedTime * 0.1) * 0.08;
   });
@@ -106,17 +115,15 @@ function DustParticles() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                             MOON SURFACE MATERIAL                          */
+/*                                   MOON                                     */
 /* -------------------------------------------------------------------------- */
 
-function MoonSurface() {
+function MoonSurface({
+  onFlash,
+}: {
+  onFlash?: () => void;
+}) {
   const moonRef = useRef<THREE.Group>(null);
-
-  /*
-    IMPORTANT:
-    Geometry bilkul normal sphere hai.
-    Isliye moon ki outer shape hamesha perfectly round rahegi.
-  */
 
   useFrame((state) => {
     if (!moonRef.current) return;
@@ -148,8 +155,9 @@ function MoonSurface() {
     <group
       ref={moonRef}
       position={[0, -5.25, -3.8]}
+      onClick={() => onFlash?.()}
     >
-      {/* MAIN PERFECTLY ROUND MOON */}
+      {/* MAIN MOON */}
       <mesh>
         <sphereGeometry args={[6.4, 160, 160]} />
 
@@ -160,7 +168,7 @@ function MoonSurface() {
         />
       </mesh>
 
-      {/* LARGE SUBTLE CRATER SHADOWS */}
+      {/* LARGE CRATERS */}
 
       <mesh position={[-1.7, 1.1, 5.75]}>
         <circleGeometry args={[0.62, 64]} />
@@ -245,7 +253,8 @@ function MoonSurface() {
         />
       </mesh>
 
-      {/* DARK ATMOSPHERIC EDGE */}
+      {/* DARK EDGE */}
+
       <mesh scale={1.003}>
         <sphereGeometry args={[6.4, 160, 160]} />
 
@@ -261,34 +270,30 @@ function MoonSurface() {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                                  LIGHTING                                  */
+/*                                  LIGHTS                                    */
 /* -------------------------------------------------------------------------- */
 
 function SceneLights() {
   return (
     <>
-      {/* Main cinematic light */}
       <directionalLight
         position={[-6, 8, 8]}
         intensity={2.2}
         color="#f5f5f4"
       />
 
-      {/* Soft secondary fill */}
       <directionalLight
         position={[5, 1, 6]}
         intensity={0.35}
         color="#a1a1aa"
       />
 
-      {/* Keep lower moon dark */}
       <directionalLight
         position={[0, -6, 3]}
         intensity={0.05}
         color="#64748b"
       />
 
-      {/* Gentle horizon glow */}
       <pointLight
         position={[0, 4, 5]}
         intensity={0.45}
@@ -303,7 +308,9 @@ function SceneLights() {
 /*                                HERO SCENE                                  */
 /* -------------------------------------------------------------------------- */
 
-export default function HeroSculpture() {
+export default function HeroSculpture({
+  onFlash,
+}: HeroSculptureProps) {
   return (
     <div className="absolute inset-0 h-full w-full overflow-hidden">
       <Canvas
@@ -315,10 +322,12 @@ export default function HeroSculpture() {
         gl={{
           alpha: true,
           antialias: true,
-          toneMapping: THREE.ACESFilmicToneMapping,
+        }}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1;
         }}
       >
-        {/* Transparent / black cinematic world */}
         <color attach="background" args={['#030405']} />
 
         <fog
@@ -330,7 +339,7 @@ export default function HeroSculpture() {
 
         <SceneLights />
 
-        <MoonSurface />
+        <MoonSurface onFlash={onFlash} />
 
         <Stars />
 
