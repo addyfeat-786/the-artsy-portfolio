@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -13,35 +12,35 @@ import { getFeaturedProjects } from '@/data/projects';
 import { services } from '@/data/services';
 import { testimonials, clients } from '@/data/testimonials';
 
-const HeroSculpture = dynamic(() => import('@/components/three/hero-sculpture'), {
-  ssr: false,
-});
+const HeroSculpture = dynamic(
+  () => import('@/components/three/hero-sculpture'),
+  {
+    ssr: false,
+  }
+);
 
 const featured = getFeaturedProjects();
 
-const heroWords = ['Motion Designer', 'Visual Storyteller', 'Creative Director'];
+const heroWords = [
+  'Motion Designer',
+  'Visual Storyteller',
+  'Creative Director',
+];
 
 export default function Home() {
-  const [flash, setFlash] = useState(0);
-
   return (
     <main className="grain">
       {/* HERO */}
       <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
+        {/* VIDEO + THREE BACKGROUND */}
         <div className="absolute inset-0">
-          <HeroSculpture onFlash={() => setFlash((f) => f + 1)} />
+          <HeroSculpture />
         </div>
+
+        {/* EXTRA CINEMATIC OVERLAY */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background" />
 
-        {/* White flash overlay — fires once per hover */}
-        <motion.div
-          key={flash}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.85, 0] }}
-          transition={{ duration: 0.5, times: [0, 0.08, 1], ease: 'easeOut' }}
-          className="pointer-events-none absolute inset-0 z-20 bg-white"
-        />
-
+        {/* HERO CONTENT */}
         <div className="relative z-10 flex flex-col items-center text-center">
           <motion.span
             initial={{ opacity: 0 }}
@@ -53,8 +52,13 @@ export default function Home() {
           </motion.span>
 
           <motion.h1
-            animate={flash > 0 ? { filter: ['drop-shadow(0 0 0px rgba(255,255,255,0))', 'drop-shadow(0 0 28px rgba(255,255,255,0.85))', 'drop-shadow(0 0 0px rgba(255,255,255,0))'] } : {}}
-            transition={{ duration: 0.6, times: [0, 0.1, 1], ease: 'easeOut' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 1,
+              delay: 0.35,
+              ease: [0.16, 1, 0.3, 1],
+            }}
             className="text-balance font-display text-hero font-medium tracking-tightest"
           >
             THE{' '}
@@ -73,7 +77,10 @@ export default function Home() {
                   delay: 0.6 + i * 0.15,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                style={{ marginRight: i < heroWords.length - 1 ? '1.5rem' : 0 }}
+                style={{
+                  marginRight:
+                    i < heroWords.length - 1 ? '1.5rem' : 0,
+                }}
               >
                 {w}
               </motion.span>
@@ -93,6 +100,7 @@ export default function Home() {
               View Work
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
+
             <Link
               href="/contact"
               className="text-xs uppercase tracking-[0.2em] text-muted-foreground transition-opacity hover:opacity-60"
@@ -102,6 +110,7 @@ export default function Home() {
           </motion.div>
         </div>
 
+        {/* SCROLL DOWN ICON */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -110,7 +119,11 @@ export default function Home() {
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
           >
             <ArrowDown className="h-4 w-4" />
           </motion.div>
@@ -123,11 +136,22 @@ export default function Home() {
           <Reveal>
             <p className="max-w-4xl text-balance font-display text-3xl font-light leading-tight tracking-tight md:text-5xl md:leading-[1.1]">
               A multidisciplinary studio crafting{' '}
-              <span className="italic text-muted-foreground">motion</span>,{' '}
-              <span className="italic text-muted-foreground">film</span>,{' '}
-              <span className="italic text-muted-foreground">design</span>, and{' '}
-              <span className="italic text-muted-foreground">photography</span> for
-              brands that refuse to be ignored.
+              <span className="italic text-muted-foreground">
+                motion
+              </span>
+              ,{' '}
+              <span className="italic text-muted-foreground">
+                film
+              </span>
+              ,{' '}
+              <span className="italic text-muted-foreground">
+                design
+              </span>
+              , and{' '}
+              <span className="italic text-muted-foreground">
+                photography
+              </span>{' '}
+              for brands that refuse to be ignored.
             </p>
           </Reveal>
         </div>
@@ -148,6 +172,7 @@ export default function Home() {
             />
           </div>
         </div>
+
         <FeaturedCarousel projects={featured} />
       </section>
 
@@ -162,6 +187,7 @@ export default function Home() {
               </>
             }
           />
+
           <div className="mt-16 grid gap-px border-t border-hairline md:grid-cols-2">
             {services.map((s, i) => (
               <Reveal key={s.number} delay={i * 0.05}>
@@ -170,6 +196,7 @@ export default function Home() {
                     <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
                       {s.number}
                     </span>
+
                     <Link
                       href="/services"
                       className="text-muted-foreground transition-opacity group-hover:opacity-100 md:opacity-0"
@@ -177,12 +204,15 @@ export default function Home() {
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   </div>
+
                   <h3 className="font-display text-3xl font-medium tracking-tightest md:text-4xl">
                     {s.title}
                   </h3>
+
                   <p className="max-w-md text-pretty text-muted-foreground">
                     {s.description}
                   </p>
+
                   <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs uppercase tracking-[0.15em] text-muted-foreground">
                     {s.deliverables.map((d) => (
                       <li key={d}>{d}</li>
@@ -220,6 +250,7 @@ export default function Home() {
               </>
             }
           />
+
           <div className="mt-16 grid gap-8 md:grid-cols-2">
             {testimonials.map((t, i) => (
               <Reveal key={t.name} delay={i * 0.08}>
@@ -227,6 +258,7 @@ export default function Home() {
                   <blockquote className="text-balance font-display text-2xl font-light leading-snug tracking-tight md:text-3xl">
                     “{t.quote}”
                   </blockquote>
+
                   <figcaption className="mt-10 flex items-center gap-3 text-sm">
                     <span className="h-px w-8 bg-foreground/40" />
                     <span className="font-medium">{t.name}</span>
