@@ -27,8 +27,8 @@ export interface Project {
 export const projects: Project[] = [
   {
     title: 'Liquor By Door',
-    slug: 'Liquor By Door',
-    category: 'Graphics Design',
+    slug: 'liquor-by-door',
+    category: 'Graphic Design',
     thumbnail: '/images/project-01.jpg',
     previewVideo: '/videos/project-preview.mp4',
     galleryImages: [
@@ -37,157 +37,245 @@ export const projects: Project[] = [
       '/images/project-03.jpg',
     ],
     description:
-      'A cinematic brand film for Aurora, a Nordic skincare house. Light, glass, and motion dissolve into a single breathing frame.',
-    software: ['After Effects', 'Cinema 4D', 'DaVinci Resolve'],
+      'Creative design work developed for Liquor By Door, focused on building a strong and engaging visual presence.',
+    software: ['Photoshop', 'Illustrator', 'After Effects'],
     client: 'Liquor By Door',
     year: '2024',
     featured: true,
     story: {
       challenge:
-        'Translating a quiet, sensorial product story into motion without a single spoken word.',
+        'Creating visuals that stand out while maintaining a consistent and recognizable brand presence.',
       process:
-        'Built a custom lighting rig in Cinema 4D, hand-tracked transitions in After Effects, and graded for a cold, luminous skin tone.',
+        'Developed creative concepts, campaign visuals, social media creatives, and motion assets aligned with the brand.',
       output:
-        'A 90-second film that became the centerpiece of the brand relaunch across cinema and digital.',
+        'A cohesive visual identity and a collection of engaging creative assets for digital platforms.',
     },
-    results: ['+312% engagement lift', 'Featured on Awwwards', '2.4M views in 30 days'],
+    results: [
+      'Brand-focused creative direction',
+      'Social media creative assets',
+      'Motion and graphic design',
+    ],
   },
+
   {
-    title: 'Graphic Design',
-    slug: 'Social media handeling',
-    category: 'Motion Graphics',
+    title: 'Social Media Handling',
+    slug: 'social-media-handling',
+    category: 'Graphic Design',
     thumbnail: '/images/project-02.jpg',
     previewVideo: '/videos/project-preview.mp4',
-    galleryImages: ['/images/project-02.jpg', '/images/project-03.jpg', '/images/project-04.jpg'],
+    galleryImages: [
+      '/images/project-02.jpg',
+      '/images/project-03.jpg',
+      '/images/project-04.jpg',
+    ],
     description:
-      'A brutalist title sequence for an independent feature film. Type as architecture, silence as rhythm.',
-    software: ['After Effects', 'Houdini', 'Premiere Pro'],
-    client: 'Monolith Films',
+      'A collection of social media creatives designed to create a consistent, engaging, and visually strong online presence.',
+    software: ['Photoshop', 'Illustrator', 'After Effects'],
+    client: 'Multiple Clients',
     year: '2024',
     featured: true,
     story: {
-      challenge: 'Setting the tone for a film about absence and monument.',
-      process: 'Procedural type fracture in Houdini, composited with grain and lens distortion.',
-      output: 'A 60-second opening that played at three international festivals.',
+      challenge:
+        'Creating fresh content consistently without losing the unique identity of each brand.',
+      process:
+        'Planned content directions and created static posts, campaign creatives, reels, and promotional assets.',
+      output:
+        'A consistent visual presence across multiple social media campaigns and platforms.',
     },
-    results: ['Festival selection — Locarno', 'Best Titles nomination'],
+    results: [
+      'Creative content strategy',
+      'Campaign design',
+      'Consistent brand presence',
+    ],
   },
+
   {
-    title: 'Field Notes — Documentary Edit',
-    slug: 'field-notes-documentary',
+    title: 'Video Editing Projects',
+    slug: 'video-editing-projects',
     category: 'Video Editing',
     thumbnail: '/images/project-03.jpg',
     previewVideo: '/videos/project-preview.mp4',
-    galleryImages: ['/images/project-03.jpg', '/images/project-04.jpg', '/images/project-05.jpg'],
+    galleryImages: [
+      '/images/project-03.jpg',
+      '/images/project-04.jpg',
+      '/images/project-05.jpg',
+    ],
     description:
-      'A 22-minute documentary edit following a year in the life of a botanical garden. Patience as a narrative device.',
-    software: ['Premiere Pro', 'DaVinci Resolve', 'Pro Tools'],
-    client: 'Kew Studios',
-    year: '2023',
+      'A selection of professionally edited videos including promotional content, social media reels, advertisements, and branded films.',
+    software: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
+    client: 'Multiple Clients',
+    year: '2024',
     featured: true,
     story: {
-      challenge: 'Holding a viewer across a full season of slow change.',
-      process: 'Cut to the rhythm of the seasons rather than a script; sound designed from field recordings.',
-      output: 'A meditative edit acquired by a streaming documentary platform.',
+      challenge:
+        'Turning raw footage into engaging stories that hold attention and communicate the message clearly.',
+      process:
+        'Edited footage, designed pacing, added sound design, color grading, transitions, motion graphics, and visual effects.',
+      output:
+        'High-quality video content optimized for digital platforms and audience engagement.',
     },
-    results: ['Streaming acquisition', 'Vimeo Staff Pick'],
+    results: [
+      'Promotional videos',
+      'Social media reels',
+      'Brand films and advertisements',
+    ],
   },
+
   {
-    title: 'Atelier — Identity System',
-    slug: 'atelier-identity',
+    title: 'Brand Identity Design',
+    slug: 'brand-identity-design',
     category: 'Graphic Design',
     thumbnail: '/images/project-04.jpg',
-    galleryImages: ['/images/project-04.jpg', '/images/project-05.jpg', '/images/project-06.jpg'],
+    galleryImages: [
+      '/images/project-04.jpg',
+      '/images/project-05.jpg',
+      '/images/project-06.jpg',
+    ],
     description:
-      'A complete visual identity for a Parisian atelier — wordmark, type system, and print collateral.',
-    software: ['Illustrator', 'InDesign', 'Glyphs'],
-    client: 'Atelier Vingt',
+      'Visual identity systems designed to help brands communicate clearly and create a memorable presence.',
+    software: ['Illustrator', 'Photoshop', 'Figma'],
+    client: 'Multiple Clients',
     year: '2024',
     featured: true,
     story: {
-      challenge: 'An identity that feels handmade but scales across signage and digital.',
-      process: 'Drew the wordmark from a single calligraphic gesture, then digitised into a variable system.',
-      output: 'A living identity now used across the atelier’s flagship store and online presence.',
+      challenge:
+        'Building a visual identity that feels distinctive while remaining practical across multiple platforms.',
+      process:
+        'Developed logos, typography systems, color directions, brand assets, and supporting visual guidelines.',
+      output:
+        'Complete and scalable identity systems ready for digital, social, and marketing applications.',
     },
-    results: ['Flagship rollout', 'Rebrand of the year — shortlist'],
+    results: [
+      'Logo design',
+      'Visual identity systems',
+      'Brand guidelines',
+    ],
   },
+
   {
-    title: 'Still Life — Studio Series',
-    slug: 'still-life-studio',
+    title: 'Photography Projects',
+    slug: 'photography-projects',
     category: 'Photography',
     thumbnail: '/images/project-05.jpg',
-    galleryImages: ['/images/project-05.jpg', '/images/project-06.jpg', '/images/project-07.jpg'],
+    galleryImages: [
+      '/images/project-05.jpg',
+      '/images/project-06.jpg',
+      '/images/project-07.jpg',
+    ],
     description:
-      'A still-life photography series on everyday objects, lit like old-master paintings.',
-    software: ['Capture One', 'Photoshop'],
-    client: 'Self-initiated',
-    year: '2023',
+      'A collection of photography work covering products, events, brands, lifestyle, and creative visual storytelling.',
+    software: ['Lightroom', 'Photoshop', 'Capture One'],
+    client: 'Multiple Clients',
+    year: '2024',
     featured: false,
     story: {
-      challenge: 'Finding monumentality in the ordinary.',
-      process: 'Single-source lighting, long exposures, and a hand-painted backdrop.',
-      output: 'A 12-piece series exhibited in a group show.',
+      challenge:
+        'Capturing visuals that feel natural, professional, and aligned with the purpose of each project.',
+      process:
+        'Handled composition, lighting, camera work, image selection, and professional post-production.',
+      output:
+        'A versatile collection of polished photography assets for brands and campaigns.',
     },
-    results: ['Group exhibition — Berlin'],
+    results: [
+      'Product photography',
+      'Event photography',
+      'Lifestyle visuals',
+    ],
   },
+
   {
-    title: 'Pulse — Music Video',
-    slug: 'pulse-music-video',
-    category: 'Video Editing',
+    title: 'Motion Graphics',
+    slug: 'motion-graphics',
+    category: 'Motion Graphics',
     thumbnail: '/images/project-06.jpg',
     previewVideo: '/videos/project-preview.mp4',
-    galleryImages: ['/images/project-06.jpg', '/images/project-07.jpg', '/images/project-08.jpg'],
+    galleryImages: [
+      '/images/project-06.jpg',
+      '/images/project-07.jpg',
+      '/images/project-08.jpg',
+    ],
     description:
-      'A fast-cut music video edit for an electronic act, built on a single continuous take.',
-    software: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
-    client: 'Pulse Records',
+      'Motion graphics and animated visual content created for brands, advertisements, social media, and digital campaigns.',
+    software: ['After Effects', 'Illustrator', 'Premiere Pro'],
+    client: 'Multiple Clients',
     year: '2024',
     featured: true,
     story: {
-      challenge: 'Creating motion from a single locked-off shot.',
-      process: 'Time-remapped the master, layered masked passes, and graded for neon-on-black.',
-      output: 'The artist’s most-streamed video to date.',
+      challenge:
+        'Making static ideas feel dynamic while keeping the message clear and visually engaging.',
+      process:
+        'Created animation systems, typography motion, transitions, visual effects, and branded motion assets.',
+      output:
+        'Engaging motion content designed for advertisements, presentations, social media, and campaigns.',
     },
-    results: ['1.8M streams in first month'],
+    results: [
+      'Animated brand assets',
+      'Typography animation',
+      'Social media motion graphics',
+    ],
   },
+
   {
-    title: 'Form — Type Specimen',
-    slug: 'form-type-specimen',
+    title: 'Creative Campaign Design',
+    slug: 'creative-campaign-design',
     category: 'Graphic Design',
     thumbnail: '/images/project-07.jpg',
-    galleryImages: ['/images/project-07.jpg', '/images/project-08.jpg', '/images/project-01.jpg'],
+    galleryImages: [
+      '/images/project-07.jpg',
+      '/images/project-08.jpg',
+      '/images/project-01.jpg',
+    ],
     description:
-      'A digital type specimen and microsite for a new independent type foundry.',
-    software: ['Illustrator', 'Figma', 'Webflow'],
-    client: 'Form Foundry',
-    year: '2023',
+      'Campaign-focused creative design developed for promotions, launches, advertisements, and marketing initiatives.',
+    software: ['Photoshop', 'Illustrator', 'After Effects'],
+    client: 'Multiple Clients',
+    year: '2024',
     featured: false,
     story: {
-      challenge: 'Showing a typeface’s character without a single sentence of marketing copy.',
-      process: 'Designed an interactive specimen where the type itself is the interface.',
-      output: 'Specimen drove pre-orders for the full family within a week.',
+      challenge:
+        'Creating campaign visuals that communicate quickly and remain visually consistent across different formats.',
+      process:
+        'Developed campaign concepts and adapted them into social posts, advertisements, banners, videos, and promotional assets.',
+      output:
+        'A complete creative system that works across multiple marketing touchpoints.',
     },
-    results: ['Sold-out first release'],
+    results: [
+      'Campaign concepts',
+      'Marketing creatives',
+      'Multi-platform design systems',
+    ],
   },
+
   {
-    title: 'Coast — Travel Film',
-    slug: 'coast-travel-film',
-    category: 'Motion Graphics',
+    title: 'Commercial Video Projects',
+    slug: 'commercial-video-projects',
+    category: 'Video Editing',
     thumbnail: '/images/project-08.jpg',
     previewVideo: '/videos/project-preview.mp4',
-    galleryImages: ['/images/project-08.jpg', '/images/project-01.jpg', '/images/project-02.jpg'],
+    galleryImages: [
+      '/images/project-08.jpg',
+      '/images/project-01.jpg',
+      '/images/project-02.jpg',
+    ],
     description:
-      'A travel film along the Atlantic coast, blending motion graphics with documentary footage.',
-    software: ['After Effects', 'Premiere Pro', 'DaVinci Resolve'],
-    client: 'Visit Atlantic',
-    year: '2023',
+      'Commercial and promotional video projects combining editing, motion graphics, sound design, and visual storytelling.',
+    software: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
+    client: 'Multiple Clients',
+    year: '2024',
     featured: false,
     story: {
-      challenge: 'Making a tourism film that doesn’t feel like one.',
-      process: 'Animated hand-drawn maps and route lines over footage; graded for a sun-bleached palette.',
-      output: 'A 3-minute film used across the region’s campaign for two seasons.',
+      challenge:
+        'Creating commercial videos that capture attention quickly while delivering a clear message.',
+      process:
+        'Combined footage editing, pacing, motion graphics, color grading, sound design, and finishing.',
+      output:
+        'Professional commercial videos optimized for marketing and digital platforms.',
     },
-    results: ['Regional campaign — 2 seasons'],
+    results: [
+      'Commercial video editing',
+      'Promotional content',
+      'Digital campaign videos',
+    ],
   },
 ];
 
@@ -208,6 +296,8 @@ export function getFeaturedProjects(): Project[] {
 
 export function getNextProject(slug: string): Project | undefined {
   const i = projects.findIndex((p) => p.slug === slug);
+
   if (i === -1) return undefined;
+
   return projects[(i + 1) % projects.length];
 }
