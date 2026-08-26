@@ -47,12 +47,20 @@ export default function Navbar() {
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:h-20 md:px-10">
-          <span className="font-display text-lg font-semibold">
-  NO<span className="italic">FILTER</span>
-  <span className="ml-1 text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
-    BY ARTSY
-  </span>
-</span>
+
+          {/* BRAND LOGO */}
+          <Link
+            href="/"
+            className="flex items-baseline gap-1 font-display text-lg font-semibold tracking-tightest"
+          >
+            <span>
+              NO<span className="italic">FILTER</span>
+            </span>
+
+            <span className="text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
+              BY ARTSY
+            </span>
+          </Link>
 
           <ul className="hidden items-center gap-8 md:flex">
             {links.map((l) => {
@@ -60,6 +68,7 @@ export default function Navbar() {
                 l.href === '/'
                   ? pathname === '/'
                   : pathname.startsWith(l.href);
+
               return (
                 <li key={l.href}>
                   <Link
@@ -69,6 +78,7 @@ export default function Navbar() {
                     }`}
                   >
                     {l.label}
+
                     {active && (
                       <motion.span
                         layoutId="nav-dot"
@@ -101,23 +111,38 @@ export default function Navbar() {
             transition={{ duration: 0.4 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
-              <span className="font-display text-lg font-semibold">
-  NO<span className="italic">FILTER</span>
-  <span className="ml-1 text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
-    BY ARTSY
-  </span>
-</span>
+
+              {/* MOBILE BRAND LOGO */}
+              <Link
+                href="/"
+                className="flex items-baseline gap-1 font-display text-lg font-semibold"
+              >
+                <span>
+                  NO<span className="italic">FILTER</span>
+                </span>
+
+                <span className="text-[8px] font-sans font-normal uppercase tracking-[0.18em] opacity-60">
+                  BY ARTSY
+                </span>
+              </Link>
+
               <button aria-label="Close" onClick={() => setOpen(false)}>
                 <X className="h-5 w-5" />
               </button>
             </div>
+
             <motion.ul
               className="flex flex-col gap-2 px-6 pt-8"
               initial="hidden"
               animate="show"
               variants={{
                 hidden: {},
-                show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+                show: {
+                  transition: {
+                    staggerChildren: 0.06,
+                    delayChildren: 0.1,
+                  },
+                },
               }}
             >
               {links.map((l) => (
@@ -127,7 +152,10 @@ export default function Navbar() {
                     hidden: { opacity: 0, y: 20 },
                     show: { opacity: 1, y: 0 },
                   }}
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{
+                    duration: 0.5,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
                 >
                   <Link
                     href={l.href}
