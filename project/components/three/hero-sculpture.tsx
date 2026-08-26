@@ -1,43 +1,93 @@
 'use client';
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Float, Environment, RoundedBox } from '@react-three/drei';
-import { useRef, Suspense, useMemo, useCallback } from 'react';
-import {
-  type Group,
-  type Mesh,
-  type MeshStandardMaterial,
-  type PointLight,
-  type Points,
-  MathUtils,
-  AdditiveBlending,
-  DoubleSide,
-  Color,
-} from 'three';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment } from '@react-three/drei';
+import { useMemo, useRef } from 'react';
+import * as THREE from 'three';
 
-/* ----------------------------- Dust particles ----------------------------- */
+type MoonProps = {
+  onFlash?: () => void;
+};
 
-function DustParticles() {
-  const ref = useRef<Points>(null);
-  const count = 180;
+/* -------------------------------------------------------------------------- */
+/*                              STAR BACKGROUND                               */
+/* -------------------------------------------------------------------------- */
+
+function Stars() {
+  const starsRef = useRef<THREE.Points>(null);
 
   const positions = useMemo(() => {
+    const count = 900;
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+      const radius = 8 + Math.random() * 18;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.cos(phi);
+      positions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+    }
+
+    return positions;
+  }, []);
+
+  useFrame((state) => {
+    if (!starsRef.current) return;
+
+    starsRef.current.rotation.y = state.clock.elapsedTime * 0.003;
+    starsRef.current.rotation.x =
+      Math.sin(state.clock.elapsedTime * 0.02) * 0.015;
+  });
+
+  return (
+    <points ref={starsRef}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          args={[positions, 3]}
+        />
+      </bufferGeometry>
+
+      <pointsMaterial
+        color="#ffffff"
+        size={0.018}
+        sizeAttenuation
+        transparent
+        opacity={0.7}
+        depthWrite={false}
+      />
+    </points>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              SMALL DUST                                    */
+/* -------------------------------------------------------------------------- */
+
+function DustParticles() {
+  const ref = useRef<THREE.Points>(null);
+
+  const positions = useMemo(() => {
+    const count = 180;
     const arr = new Float32Array(count * 3);
 
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 10;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 7;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 6;
+      arr[i * 3] = (Math.random() - 0.5) * 14;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 8;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 8;
     }
 
     return arr;
   }, []);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!ref.current) return;
 
-    ref.current.rotation.y += delta * 0.015;
-    ref.current.position.y = Math.sin(state.clock.elapsedTime * 0.25) * 0.08;
+    ref.current.rotation.y = state.clock.elapsedTime * 0.006;
+    ref.current.position.y =
+      Math.sin(state.clock.elapsedTime * 0.15) * 0.08;
   });
 
   return (
@@ -50,423 +100,204 @@ function DustParticles() {
       </bufferGeometry>
 
       <pointsMaterial
-        size={0.016}
         color="#ffffff"
+        size={0.025}
         transparent
-        opacity={0.45}
+        opacity={0.28}
         sizeAttenuation
         depthWrite={false}
-        blending={AdditiveBlending}
       />
     </points>
   );
 }
 
-/* --------------------------- Volumetric light --------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                              PROCEDURAL MOON                               */
+/* -------------------------------------------------------------------------- */
 
-function VolumetricShaft() {
-  return (
-    <mesh
-      position={[0.3, 3.4, -1]}
-      rotation={[Math.PI - 0.12, 0, 0.08]}
-    >
-      <coneGeometry args={[1.5, 6.5, 32, 1, true]} />
+function createMoonGeometry() {
+  const geometry = new THREE.SphereGeometry(5.4, 180, 120);
 
-      <meshBasicMaterial
-        color="#ffffff"
-        transparent
-        opacity={0.025}
-        side={DoubleSide}
-        blending={AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-  );
+  const position = geometry.attributes.position;
+
+  for (let i = 0; i < position.count; i++) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+
+    const length = Math.sqrt(x * x + y * y + z * z);
+
+    const nx = x / length;
+    const ny = y / length;
+    const nz = z / length;
+
+    /*
+      Multiple mathematical waves create rough lunar terrain.
+      This avoids needing an external moon texture.
+    */
+
+    const large =
+      Math.sin(nx * 3.2 + ny * 1.7) *
+      Math.cos(nz * 2.8) *
+      0.1;
+
+    const medium =
+      Math.sin(nx * 9.0 + nz * 7.0) *
+      Math.cos(ny * 8.0) *
+      0.035;
+
+    const fine =
+      Math.sin(nx * 25.0 + ny * 21.0 + nz * 18.0) *
+      0.018;
+
+    const surfaceNoise = large + medium + fine;
+
+    const scale = 1 + surfaceNoise;
+
+    position.setXYZ(
+      i,
+      x * scale,
+      y * scale,
+      z * scale
+    );
+  }
+
+  position.needsUpdate = true;
+  geometry.computeVertexNormals();
+
+  return geometry;
 }
 
-/* ------------------------------ Camera ------------------------------ */
+function Moon() {
+  const moonRef = useRef<THREE.Group>(null);
 
-function CameraSculpture({
-  onFlash,
-}: {
-  onFlash: () => void;
-}) {
-  const group = useRef<Group>(null);
-  const shutter = useRef<Mesh>(null);
-  const flashLight = useRef<PointLight>(null);
-  const lensMat = useRef<MeshStandardMaterial>(null);
+  const geometry = useMemo(() => createMoonGeometry(), []);
 
-  const { pointer, clock } = useThree();
+  useFrame((state, delta) => {
+    if (!moonRef.current) return;
 
-  const hovered = useRef(false);
-  const canFlash = useRef(true);
-  const flashStart = useRef(-10);
+    const mouseX = state.pointer.x;
+    const mouseY = state.pointer.y;
 
-  const triggerFlash = useCallback(() => {
-    if (!canFlash.current) return;
+    /* Very slow cinematic movement */
+    moonRef.current.rotation.y += delta * 0.012;
 
-    canFlash.current = false;
-    flashStart.current = clock.elapsedTime;
-
-    onFlash();
-  }, [clock, onFlash]);
-
-  useFrame((_, delta) => {
-    if (!group.current) return;
-
-    // Very slow cinematic rotation
-    group.current.rotation.y += delta * 0.025;
-
-    // Subtle mouse movement
-    const targetX = pointer.y * 0.08;
-    const targetZ = pointer.x * 0.08;
-
-    group.current.rotation.x = MathUtils.lerp(
-      group.current.rotation.x,
-      targetX,
+    /* Subtle mouse parallax */
+    moonRef.current.rotation.x = THREE.MathUtils.lerp(
+      moonRef.current.rotation.x,
+      -mouseY * 0.08,
       0.025
     );
 
-    group.current.rotation.z = MathUtils.lerp(
-      group.current.rotation.z,
-      targetZ,
+    moonRef.current.rotation.z = THREE.MathUtils.lerp(
+      moonRef.current.rotation.z,
+      mouseX * 0.025,
       0.025
     );
 
-    // Shutter interaction
-    if (shutter.current) {
-      const targetY = hovered.current ? 0.73 : 0.78;
-
-      shutter.current.position.y = MathUtils.lerp(
-        shutter.current.position.y,
-        targetY,
-        0.15
-      );
-    }
-
-    // Flash animation
-    const t = clock.elapsedTime - flashStart.current;
-
-    let flash = 0;
-
-    if (t >= 0 && t < 0.5) {
-      flash =
-        t < 0.04
-          ? t / 0.04
-          : 1 - (t - 0.04) / 0.46;
-
-      flash = MathUtils.clamp(flash, 0, 1);
-    }
-
-    if (flashLight.current) {
-      flashLight.current.intensity = flash * 7;
-    }
-
-    if (lensMat.current) {
-      lensMat.current.emissiveIntensity = 0.1 + flash * 2.5;
-    }
+    /* Gentle floating */
+    moonRef.current.position.y =
+      -5.2 + Math.sin(state.clock.elapsedTime * 0.18) * 0.08;
   });
 
   return (
-    <group
-      ref={group}
-      position={[0, -0.1, 0]}
-      scale={0.88}
-    >
-      <Float
-        speed={0.9}
-        rotationIntensity={0.06}
-        floatIntensity={0.28}
-      >
-        <group>
-          {/* Chrome outer frame */}
+    <group ref={moonRef} position={[0, -5.2, -3.5]}>
+      {/* Main moon */}
+      <mesh geometry={geometry}>
+        <meshStandardMaterial
+          color="#5a5a5a"
+          roughness={1}
+          metalness={0}
+        />
+      </mesh>
 
-          <RoundedBox
-            args={[2.25, 1.5, 0.82]}
-            radius={0.12}
-            smoothness={8}
-            castShadow
-          >
-            <meshStandardMaterial
-              color="#d8d8d8"
-              metalness={1}
-              roughness={0.08}
-              envMapIntensity={1.4}
-            />
-          </RoundedBox>
-
-          {/* Dark camera body */}
-
-          <RoundedBox
-            args={[2.12, 1.38, 0.86]}
-            radius={0.1}
-            smoothness={8}
-            position={[0, 0, 0.02]}
-            castShadow
-          >
-            <meshPhysicalMaterial
-              color="#050505"
-              metalness={0.15}
-              roughness={0.18}
-              transmission={0.12}
-              thickness={0.5}
-              ior={1.5}
-              clearcoat={1}
-              clearcoatRoughness={0.1}
-              envMapIntensity={1.2}
-            />
-          </RoundedBox>
-
-          {/* Right grip */}
-
-          <RoundedBox
-            args={[0.34, 1.38, 0.7]}
-            radius={0.1}
-            smoothness={6}
-            position={[1.02, 0, 0.02]}
-            castShadow
-          >
-            <meshStandardMaterial
-              color="#111111"
-              metalness={0.9}
-              roughness={0.2}
-            />
-          </RoundedBox>
-
-          {/* Viewfinder */}
-
-          <RoundedBox
-            args={[0.7, 0.34, 0.5]}
-            radius={0.08}
-            smoothness={6}
-            position={[-0.35, 0.78, -0.05]}
-            castShadow
-          >
-            <meshStandardMaterial
-              color="#080808"
-              metalness={1}
-              roughness={0.12}
-            />
-          </RoundedBox>
-
-          {/* Top dial */}
-
-          <mesh position={[0.55, 0.82, 0]} castShadow>
-            <cylinderGeometry args={[0.16, 0.16, 0.08, 48]} />
-
-            <meshStandardMaterial
-              color="#d5d5d5"
-              metalness={1}
-              roughness={0.1}
-            />
-          </mesh>
-
-          <mesh position={[0.55, 0.87, 0]}>
-            <cylinderGeometry args={[0.1, 0.1, 0.03, 48]} />
-
-            <meshStandardMaterial
-              color="#1f1f1f"
-              metalness={0.8}
-              roughness={0.3}
-            />
-          </mesh>
-
-          {/* Shutter */}
-
-          <mesh
-            ref={shutter}
-            position={[0, 0.78, 0]}
-            castShadow
-            onPointerOver={(e) => {
-              e.stopPropagation();
-              hovered.current = true;
-              triggerFlash();
-            }}
-            onPointerOut={(e) => {
-              e.stopPropagation();
-              hovered.current = false;
-              canFlash.current = true;
-            }}
-          >
-            <cylinderGeometry args={[0.11, 0.11, 0.07, 48]} />
-
-            <meshStandardMaterial
-              color="#ececec"
-              metalness={1}
-              roughness={0.05}
-            />
-          </mesh>
-
-          {/* Lens chrome */}
-
-          <mesh
-            position={[0, 0, 0.5]}
-            rotation={[Math.PI / 2, 0, 0]}
-            castShadow
-          >
-            <cylinderGeometry args={[0.5, 0.5, 0.16, 64]} />
-
-            <meshStandardMaterial
-              color="#d8d8d8"
-              metalness={1}
-              roughness={0.08}
-            />
-          </mesh>
-
-          {/* Lens outer ring */}
-
-          <mesh
-            position={[0, 0, 0.58]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <cylinderGeometry args={[0.42, 0.42, 0.05, 64]} />
-
-            <meshStandardMaterial
-              color="#181818"
-              metalness={0.9}
-              roughness={0.25}
-            />
-          </mesh>
-
-          {/* Lens glass */}
-
-          <mesh
-            position={[0, 0, 0.62]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <cylinderGeometry args={[0.38, 0.38, 0.12, 64]} />
-
-            <meshPhysicalMaterial
-              color="#030306"
-              roughness={0.05}
-              transmission={0.3}
-              thickness={0.3}
-              clearcoat={1}
-              clearcoatRoughness={0.04}
-              metalness={0.2}
-            />
-          </mesh>
-
-          {/* Inner lens */}
-
-          <mesh
-            position={[0, 0, 0.66]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <cylinderGeometry args={[0.22, 0.22, 0.06, 64]} />
-
-            <meshStandardMaterial
-              ref={lensMat}
-              color="#05050a"
-              emissive={new Color('#64748b')}
-              emissiveIntensity={0.1}
-              metalness={0.9}
-              roughness={0.18}
-            />
-          </mesh>
-
-          {/* Gold accent */}
-
-          <mesh
-            position={[0, 0, 0.69]}
-            rotation={[Math.PI / 2, 0, 0]}
-          >
-            <torusGeometry args={[0.46, 0.01, 16, 64]} />
-
-            <meshStandardMaterial
-              color="#b89b5e"
-              metalness={1}
-              roughness={0.2}
-            />
-          </mesh>
-
-          {/* Flash */}
-
-          <pointLight
-            ref={flashLight}
-            position={[0, 0, 1.3]}
-            intensity={0}
-            color="#ffffff"
-            distance={6}
-            decay={2}
-          />
-        </group>
-      </Float>
+      {/* Slight dark atmospheric shell */}
+      <mesh scale={1.006} geometry={geometry}>
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.12}
+          side={THREE.BackSide}
+        />
+      </mesh>
     </group>
   );
 }
 
-/* ------------------------------ Main Scene ------------------------------ */
+/* -------------------------------------------------------------------------- */
+/*                           CINEMATIC LIGHT RIM                              */
+/* -------------------------------------------------------------------------- */
 
-export default function HeroSculpture({
-  onFlash,
-}: {
-  onFlash?: () => void;
-}) {
-  const handleFlash = useRef<() => void>(() => {});
-
-  handleFlash.current = onFlash ?? (() => {});
-
+function MoonLighting() {
   return (
-    <div className="absolute inset-0 z-10 h-full w-full pointer-events-none">
-      <div className="pointer-events-auto h-full w-full">
-        <Canvas
-          camera={{
-            position: [0, 0, 6.8],
-            fov: 35,
-          }}
-          dpr={[1, 2]}
-          gl={{
-            alpha: true,
-            antialias: true,
-          }}
-        >
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.28} />
+    <>
+      {/* Main light from upper left */}
+      <directionalLight
+        position={[-6, 7, 5]}
+        intensity={2.4}
+        color="#ffffff"
+      />
 
-            <directionalLight
-              position={[5, 6, 5]}
-              intensity={1}
-              castShadow
-            />
+      {/* Soft front fill */}
+      <directionalLight
+        position={[4, 2, 6]}
+        intensity={0.28}
+        color="#9ca3af"
+      />
 
-            <directionalLight
-              position={[-5, -3, -5]}
-              intensity={0.25}
-            />
+      {/* Dark side */}
+      <directionalLight
+        position={[5, -3, -5]}
+        intensity={0.08}
+        color="#334155"
+      />
 
-            <spotLight
-              position={[0.4, 7, 3]}
-              intensity={1}
-              angle={0.5}
-              penumbra={1}
-              color="#ffffff"
-            />
+      {/* Horizon glow */}
+      <pointLight
+        position={[0, 3, 4]}
+        intensity={0.45}
+        distance={14}
+        color="#d6d3d1"
+      />
+    </>
+  );
+}
 
-            <pointLight
-              position={[-3, 1, 2]}
-              intensity={0.18}
-              color="#64748b"
-            />
+/* -------------------------------------------------------------------------- */
+/*                              MAIN COMPONENT                                */
+/* -------------------------------------------------------------------------- */
 
-            <pointLight
-              position={[2.5, 2, -1]}
-              intensity={0.12}
-              color="#c9a96e"
-            />
+export default function HeroSculpture({ onFlash }: MoonProps) {
+  return (
+    <div className="absolute inset-0 h-full w-full overflow-hidden">
+      <Canvas
+        camera={{
+          position: [0, 0, 11],
+          fov: 42,
+        }}
+        dpr={[1, 2]}
+        gl={{
+          alpha: true,
+          antialias: true,
+          toneMapping: THREE.ACESFilmicToneMapping,
+        }}
+      >
+        <color attach="background" args={['#030405']} />
 
-            <CameraSculpture
-              onFlash={() => handleFlash.current()}
-            />
+        <fog attach="fog" args={['#030405', 12, 28]} />
 
-            <DustParticles />
+        <ambientLight intensity={0.18} />
 
-            <VolumetricShaft />
+        <MoonLighting />
 
-            <Environment preset="studio" />
-          </Suspense>
-        </Canvas>
-      </div>
+        <Moon />
+
+        <Stars />
+
+        <DustParticles />
+
+        <Environment preset="night" />
+      </Canvas>
     </div>
   );
 }
