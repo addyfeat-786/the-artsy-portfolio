@@ -19,16 +19,13 @@ const links = [
 
 export default function Navbar() {
   const pathname = usePathname();
-
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
   const { cartCount } = useCart();
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 24);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 24);
 
     onScroll();
 
@@ -36,9 +33,7 @@ export default function Navbar() {
       passive: true,
     });
 
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-    };
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
@@ -56,15 +51,14 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
             ? 'glass border-b border-hairline'
             : 'bg-transparent'
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:h-20 md:px-10">
-
-          {/* LOGO */}
+          {/* BRAND LOGO */}
           <Link
             href="/"
             className="flex items-baseline gap-1 font-display text-lg font-semibold tracking-tightest"
@@ -111,11 +105,11 @@ export default function Navbar() {
               })}
             </ul>
 
-            {/* CART ICON */}
+            {/* CART */}
             <Link
               href="/cart"
               aria-label="Shopping Cart"
-              className="relative ml-8 flex h-9 w-9 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
+              className="relative ml-8 flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
             >
               <ShoppingBag className="h-[18px] w-[18px]" />
 
@@ -127,7 +121,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* MOBILE MENU BUTTON */}
+          {/* MOBILE BUTTON */}
           <button
             aria-label="Menu"
             onClick={() => setOpen(true)}
@@ -149,7 +143,7 @@ export default function Navbar() {
             transition={{ duration: 0.4 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
-
+              {/* MOBILE BRAND LOGO */}
               <Link
                 href="/"
                 className="flex items-baseline gap-1 font-display text-lg font-semibold"
@@ -164,7 +158,6 @@ export default function Navbar() {
               </Link>
 
               <div className="flex items-center gap-5">
-
                 {/* MOBILE CART */}
                 <Link
                   href="/cart"
@@ -180,6 +173,7 @@ export default function Navbar() {
                   )}
                 </Link>
 
+                {/* CLOSE */}
                 <button
                   aria-label="Close"
                   onClick={() => setOpen(false)}
