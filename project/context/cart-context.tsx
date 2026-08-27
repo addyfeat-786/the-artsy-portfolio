@@ -26,11 +26,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export function CartProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartProduct[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -105,9 +101,7 @@ export function useCart() {
   const context = useContext(CartContext);
 
   if (context === undefined) {
-    throw new Error(
-      'useCart must be used inside CartProvider'
-    );
+    throw new Error('useCart must be used inside CartProvider');
   }
 
   return context;
