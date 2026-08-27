@@ -1,15 +1,12 @@
 'use client';
 
-import { type ReactNode } from 'react';
-import SmoothScroll from './smooth-scroll';
-import Cursor from '../ui/cursor';
+import { ReactNode } from 'react';
+import { CartProvider } from '@/context/cart-context';
 
-export default function Providers({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <SmoothScroll />
-      <Cursor />
-      {children}
-    </>
-  );
+export default function Providers({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return <CartProvider>{children}</CartProvider>;
 }
