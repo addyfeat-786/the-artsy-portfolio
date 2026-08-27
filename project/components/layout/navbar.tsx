@@ -22,12 +22,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const { items } = useCart();
-
-  const cartCount = items.reduce(
-    (total, item) => total + item.quantity,
-    0
-  );
+  // Cart context se directly cartCount le rahe hain
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -63,6 +59,7 @@ export default function Navbar() {
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:h-20 md:px-10">
+          
           {/* BRAND LOGO */}
           <Link
             href="/"
@@ -148,6 +145,7 @@ export default function Navbar() {
             transition={{ duration: 0.4 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
+              
               {/* MOBILE BRAND LOGO */}
               <Link
                 href="/"
@@ -163,6 +161,7 @@ export default function Navbar() {
               </Link>
 
               <div className="flex items-center gap-5">
+                
                 {/* MOBILE CART */}
                 <Link
                   href="/cart"
