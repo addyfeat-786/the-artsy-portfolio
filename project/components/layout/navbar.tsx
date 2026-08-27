@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
+import { useCart } from '@/context/cart-context';
 
 const links = [
   { href: '/', label: 'Index' },
@@ -21,10 +22,22 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const { items } = useCart();
+
+  const cartCount = items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
+
     onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+
+    window.addEventListener('scroll', onScroll, {
+      passive: true,
+    });
+
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -34,6 +47,7 @@ export default function Navbar() {
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
+
     return () => {
       document.body.style.overflow = '';
     };
@@ -43,11 +57,12 @@ export default function Navbar() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled ? 'glass border-b border-hairline' : 'bg-transparent'
+          scrolled
+            ? 'glass border-b border-hairline'
+            : 'bg-transparent'
         }`}
       >
         <nav className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-6 md:h-20 md:px-10">
-
           {/* BRAND LOGO */}
           <Link
             href="/"
@@ -62,35 +77,56 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <ul className="hidden items-center gap-8 md:flex">
-            {links.map((l) => {
-              const active =
-                l.href === '/'
-                  ? pathname === '/'
-                  : pathname.startsWith(l.href);
+          {/* DESKTOP NAVIGATION */}
+          <div className="hidden items-center md:flex">
+            <ul className="flex items-center gap-8">
+              {links.map((l) => {
+                const active =
+                  l.href === '/'
+                    ? pathname === '/'
+                    : pathname.startsWith(l.href);
 
-              return (
-                <li key={l.href}>
-                  <Link
-                    href={l.href}
-                    className={`relative text-xs uppercase tracking-[0.18em] transition-opacity ${
-                      active ? 'opacity-100' : 'opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    {l.label}
+                return (
+                  <li key={l.href}>
+                    <Link
+                      href={l.href}
+                      className={`relative text-xs uppercase tracking-[0.18em] transition-opacity ${
+                        active
+                          ? 'opacity-100'
+                          : 'opacity-60 hover:opacity-100'
+                      }`}
+                    >
+                      {l.label}
 
-                    {active && (
-                      <motion.span
-                        layoutId="nav-dot"
-                        className="absolute -bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-foreground"
-                      />
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+                      {active && (
+                        <motion.span
+                          layoutId="nav-dot"
+                          className="absolute -bottom-1.5 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-foreground"
+                        />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
 
+            {/* CART */}
+            <Link
+              href="/cart"
+              aria-label="Shopping Cart"
+              className="relative ml-8 flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:opacity-100"
+            >
+              <ShoppingBag className="h-[18px] w-[18px]" />
+
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-medium text-background">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </Link>
+          </div>
+
+          {/* MOBILE BUTTON */}
           <button
             aria-label="Menu"
             onClick={() => setOpen(true)}
@@ -101,6 +137,7 @@ export default function Navbar() {
         </nav>
       </header>
 
+      {/* MOBILE MENU */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -111,7 +148,6 @@ export default function Navbar() {
             transition={{ duration: 0.4 }}
           >
             <div className="flex h-16 items-center justify-between px-6">
-
               {/* MOBILE BRAND LOGO */}
               <Link
                 href="/"
@@ -126,9 +162,30 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              <button aria-label="Close" onClick={() => setOpen(false)}>
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-5">
+                {/* MOBILE CART */}
+                <Link
+                  href="/cart"
+                  aria-label="Shopping Cart"
+                  className="relative flex h-8 w-8 items-center justify-center"
+                >
+                  <ShoppingBag className="h-5 w-5" />
+
+                  {cartCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-medium text-background">
+                      {cartCount > 99 ? '99+' : cartCount}
+                    </span>
+                  )}
+                </Link>
+
+                {/* CLOSE */}
+                <button
+                  aria-label="Close"
+                  onClick={() => setOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
             <motion.ul
@@ -149,8 +206,14 @@ export default function Navbar() {
                 <motion.li
                   key={l.href}
                   variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    show: { opacity: 1, y: 0 },
+                    hidden: {
+                      opacity: 0,
+                      y: 20,
+                    },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                    },
                   }}
                   transition={{
                     duration: 0.5,
